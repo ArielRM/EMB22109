@@ -64,6 +64,7 @@ stateDiagram-v2
     note left of s4
         mem_addr_src = true
         mem_read = true
+        pc_incr = false
     end note
 
     note left of s5
@@ -74,9 +75,11 @@ stateDiagram-v2
     note left of s6
         mem_addr_src = true
         mem_write = true
+        pc_incr = false
     end note
 
     note left of s7
+        pc_incr = false
         [instruction == ISA.JMP ] / pc_load = true
         [instruction == ISA.JN && n_flag == true] / pc_load = true
         [instruction == ISA.JZ && z_flag == true] / pc_load = true
@@ -89,6 +92,7 @@ stateDiagram-v2
     end note
 
     note right of s9
+        pc_incr = false
         [instruction == ISA.ADD ] / ula_op = 1
         [instruction == ISA.AND ] / ula_op = 2
         [instruction == ISA.OR ] / ula_op = 3
