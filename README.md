@@ -26,14 +26,14 @@ stateDiagram-v2
     s0 --> s1
     s1 --> s2
 
-    s2 --> [*] : instruction == ISA.NOP
-    s2 --> s10: instruction == ISA.HLT
-    s2 --> s3 : instruction == ISA.STA
-    s2 --> s9 : instruction == ISA.NOT
+    s2 --> [*] : (1) instruction == ISA.NOP
+    s2 --> s10: (2) instruction == ISA.HLT
+    s2 --> s3 : (3) instruction == ISA.STA
+    s2 --> s9 : (4) instruction == ISA.NOT
 
-    s3 --> s6 : instruction == ISA.STA
-    s3 --> s7 : instruction >= ISA.JMP
-    s3 --> s4
+    s3 --> s6 : (1) instruction == ISA.STA
+    s3 --> s7 : (2) instruction >= ISA.JMP
+    s3 --> s4 : (3)
 
     s4 --> s5
     s5 --> s9
