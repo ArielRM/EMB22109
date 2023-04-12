@@ -1,6 +1,6 @@
 #include <systemc>
 #include <iostream>
-#include "mem.hh"
+#include "control.hh"
 
 using namespace std;
 using namespace sc_core;
