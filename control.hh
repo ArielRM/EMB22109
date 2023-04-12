@@ -1,8 +1,10 @@
-
 #ifndef CONTROL_H_
 #define CONTROL_H_
 
-#include <systemc.h>
+#include <systemc>
+
+using namespace sc_core;
+using sc_dt::sc_uint;
 
 SC_MODULE(Control){
     // Declare ports
