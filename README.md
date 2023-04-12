@@ -28,7 +28,7 @@ stateDiagram-v2
 
     s2 --> [*] : (1) instruction == ISA.NOP
     s2 --> s10: (2) instruction == ISA.HLT
-    s2 --> s3 : (3) instruction == ISA.STA
+    s2 --> s3 : (3) instruction >= ISA.STA
     s2 --> s9 : (4) instruction == ISA.NOT
 
     s3 --> s6 : (1) instruction == ISA.STA
