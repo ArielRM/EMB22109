@@ -20,35 +20,34 @@ using std::cout;
 using std::endl;
 
 // Top-level
-SC_MODULE(Neander)
-{
+SC_MODULE(Neander) {
 	// Input Port
 	sc_in<bool> clock;
 
-	void process()
-	{
+	void process() {
 		_mem_data_out_int = static_cast<sc_int<8>>(_mem_data_out.read());
-		_mem_data_out_uint =static_cast<sc_uint<8>>(_mem_data_out.read());
+		_mem_data_out_uint = static_cast<sc_uint<8>>(_mem_data_out.read());
 		_mem_data_in = static_cast<sc_bv<8>>(_ac_data_out.read());
 	}
 
-	Mem<8, 8> *mem()
-	{
+	Mem<8, 8>* mem() {
 		return &_mem;
 	}
 
-	void execution_stats()
-	{
+	void execution_stats() {
 		cout << "++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 		cout << "Instructions Executed: " << _uc.instruction_count() << endl;
 		cout << "               Cycles: " << _uc.cycles() << endl;
-		cout << "                  CPI: " << _uc.cycles() / (double)_uc.instruction_count() << endl;
+		cout << "                  CPI: "
+				<< _uc.cycles() / (double) _uc.instruction_count() << endl;
 		cout << "++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
 	}
 
-	SC_CTOR(Neander) : _ac("AC"), _pc("PC"), _mux_addr("MUX_Addr"),
-					   _mem("MEM"), _alu("ALU"), _uc("UC")
-	{
+	void draw();
+
+	SC_CTOR(Neander) :
+			_ac("AC"), _pc("PC"), _mux_addr("MUX_Addr"), _mem("MEM"), _alu(
+					"ALU"), _uc("UC") {
 		// Connect Signals
 		_ac.clock(_ac_load);
 		_ac.reset(_sempre_false);
@@ -99,11 +98,9 @@ SC_MODULE(Neander)
 	}
 
 	// Unit testbench
-	static int testbench(const char *trace_file)
-	{
+	static int testbench(const char *trace_file) {
 		sc_trace_file *tf = sc_create_vcd_trace_file(trace_file);
 		tf->set_time_unit(1, SC_NS);
-
 
 		// Signals used in testbench
 		sc_clock clk("clock", 2, SC_NS, -0.5);
@@ -114,11 +111,24 @@ SC_MODULE(Neander)
 		// Component initialization
 		Neander neander("Neander");
 
+		Mem<8, 8> *mem = neander.mem();
+
+		sc_bv<8> prog[] = { Control::LDA, 128, Control::ADD, 129, Control::JN,
+				10, Control::STA, 130, Control::JMP, 12, Control::STA, 131,
+				Control::HLT, };
+
+		for (int i = 0; i < 10; i++) {
+			mem->_memory[i] = prog[i];
+		}
+
 		// Signal Connections
 		neander.clock(clk);
 
 		// Generate Stimuli
-		sc_start(10, SC_NS);
+		for (int i = 0; i < 10; i++) {
+			neander.draw();
+			sc_start(2, SC_NS);
+		}
 
 		// Close trace file
 		sc_close_vcd_trace_file(tf);
@@ -146,7 +156,7 @@ private:
 
 	sc_signal<sc_uint<8>> _mem_data_out_uint; // esse existe porque o tipo de sinal precisa ser convertido
 	sc_signal<sc_int<8>> _mem_data_out_int; // esse existe porque o tipo de sinal precisa ser convertido
-	
+
 	/* sinais de controle */
 	sc_signal<bool> _mem_rd;
 	sc_signal<bool> _mem_wr;

@@ -122,6 +122,7 @@ SC_MODULE(Control)
 				{
 				case NOP:
 					end_instruction();
+					break;
 				case HLT:
 					_state = CS_HLT;
 					break;
@@ -153,6 +154,7 @@ SC_MODULE(Control)
 				case JN:
 				case JZ:
 					_state = CS_JMP_EXEC;
+					break;
 				case ADD:
 				case AND:
 				case OR:
@@ -205,7 +207,36 @@ SC_MODULE(Control)
 	unsigned int cycles() { return _cycles; }
 	unsigned int instruction_count() { return _inst_count; }
 
-private:
+	static const char* instruction_stringfy(unsigned instruction)
+	{
+		switch(instruction) {
+			case NOP:
+				return("NOP");
+			case NOT:
+				return("NOT");
+			case HLT:
+				return("HLT");
+			case STA:
+				return("STA");
+			case ADD:
+				return("ADD");
+			case AND:
+				return("AND");
+			case OR:
+				return("OR "); 
+			case LDA:
+				return("LDA");
+			case JMP:
+				return("JMP");
+			case JN:
+				return("JN "); 
+			case JZ:
+				return("JZ "); 
+			default:
+				return("UNK");
+		}
+	}
+
 	static const unsigned int NOP = 0b0'000'0'000;
 	static const unsigned int NOT = 0b0'100'0'000;
 	static const unsigned int HLT = 0b0'111'0'000;
@@ -217,6 +248,7 @@ private:
 	static const unsigned int JMP = 0b1'110'0'000;
 	static const unsigned int JN = 0b1'111'1'000;
 	static const unsigned int JZ = 0b1'111'0'000;
+private:
 
 	static unsigned int alu_op(const unsigned int inst)
 	{

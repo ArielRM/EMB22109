@@ -9,9 +9,9 @@ using sc_dt::sc_uint;
 
 template <unsigned BITS>
 SC_MODULE(ALU)
-{	
+{
 	static_assert(BITS > 0);
-	
+
 	// Declare ports
 	sc_in<sc_int<BITS>> a, b;
 	sc_in<sc_uint<3>> op;
@@ -116,13 +116,36 @@ SC_MODULE(ALU)
 		return 0;
 	}
 
-private:
+	static const char* operation_stringfy(unsigned int operation)
+	{
+		switch (operation)
+		{
+		case NOP:
+			return("NOP");
+		case ADD:
+			return("ADD");
+		case AND:
+			return("AND");
+		case OR:
+			return("OR ");
+		case NOT:
+			return("NOT");
+		case LDA:
+			return("LDA");
+		default:
+			return("UNK");
+			break;
+		}
+	}
+
 	static const unsigned int NOP = 0;
-    static const unsigned int ADD = 1;
-    static const unsigned int AND = 2;
-    static const unsigned int OR = 3;
-    static const unsigned int NOT = 4;
-    static const unsigned int LDA = 5;
+	static const unsigned int ADD = 1;
+	static const unsigned int AND = 2;
+	static const unsigned int OR = 3;
+	static const unsigned int NOT = 4;
+	static const unsigned int LDA = 5;
+
+private:
 	sc_int<BITS> _output;
 };
 

@@ -6,7 +6,7 @@ CPPFLAGS=-std=c++14 -I$(INCLUDE_SYSTEMC) -O0 -g3 -Wall -fmessage-length=0 -MMD
 LDFLAGS=-L$(LIB_SYSTEMC)
 LDLIBS=-lsystemc
 
-SRCS=main.cc
+SRCS=main.cc draw.cc
 OBJS=build/$(subst .cc,.o,$(SRCS))
 
 .PHONY: run all
@@ -26,3 +26,4 @@ build:
 	mkdir build
 
 -include build/main.d
+-include build/draw.d

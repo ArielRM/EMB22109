@@ -124,8 +124,8 @@ SC_MODULE(Mem)
 		return 0;
 	}
 
-private:
 	sc_bv<BITS> _memory[(1 << ADDR_BITS) - 1];
+private:
 };
 
 #endif /* MEM_HH_ */
