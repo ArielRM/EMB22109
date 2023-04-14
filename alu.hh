@@ -2,13 +2,10 @@
 #define ALU_HH_
 
 #include <systemc>
-#include <iostream>
 
 using namespace sc_core;
 using sc_dt::sc_int;
 using sc_dt::sc_uint;
-
-#include "alu_op.hh"
 
 template <unsigned BITS>
 SC_MODULE(ALU)
@@ -24,26 +21,23 @@ SC_MODULE(ALU)
 	// Main process
 	void process()
 	{
-		unsigned temp = op.read();
-		ALUOperation operation = static_cast<ALUOperation>(temp);
-
-		switch (operation)
+		switch (op.read())
 		{
-		case ALUOperation::NOP:
+		case NOP:
 			break;
-		case ALUOperation::ADD:
+		case ADD:
 			_output = a.read() + b.read();
 			break;
-		case ALUOperation::AND:
+		case AND:
 			_output = a.read() & b.read();
 			break;
-		case ALUOperation::OR:
+		case OR:
 			_output = a.read() | b.read();
 			break;
-		case ALUOperation::NOT:
+		case NOT:
 			_output = ~b.read();
 			break;
-		case ALUOperation::LDA:
+		case LDA:
 			_output = a.read();
 			break;
 		default:
@@ -93,27 +87,25 @@ SC_MODULE(ALU)
 		ula.Z(Z);
 
 		// Generate Stimuli
-		ALUOperation op_list[] = {ALUOperation::ADD};
-		
 		a = 1 << (BITS - 1);
 		b = 1;
 
-		op = op_list[0];
+		op = ADD;
 		sc_start(2, SC_NS);
 
-		op = ALUOperation::AND;
+		op = AND;
 		sc_start(2, SC_NS);
 
-		op = ALUOperation::LDA;
+		op = LDA;
 		sc_start(2, SC_NS);
 
-		op = ALUOperation::NOP;
+		op = NOP;
 		sc_start(2, SC_NS);
 
-		op = ALUOperation::NOT;
+		op = NOT;
 		sc_start(2, SC_NS);
 
-		op = ALUOperation::OR;
+		op = OR;
 		sc_start(2, SC_NS);
 
 		sc_stop();
@@ -125,6 +117,12 @@ SC_MODULE(ALU)
 	}
 
 private:
+	static const unsigned int NOP = 0;
+    static const unsigned int ADD = 1;
+    static const unsigned int AND = 2;
+    static const unsigned int OR = 3;
+    static const unsigned int NOT = 4;
+    static const unsigned int LDA = 5;
 	sc_int<BITS> _output;
 };
 

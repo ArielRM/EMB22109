@@ -1,25 +1,10 @@
-#ifndef CONTROL_H_
-#define CONTROL_H_
+#ifndef CONTROL_HH_
+#define CONTROL_HH_
 
 #include <systemc>
 
 using namespace sc_core;
 using sc_dt::sc_uint;
-
-enum ISA : unsigned
-{
-	NOP,
-	NOT,
-	HLT,
-	STA,
-	ADD,
-	AND,
-	OR,
-	LDA,
-	JMP,
-	JN,
-	JZ,
-};
 
 SC_MODULE(Control)
 {
@@ -27,7 +12,7 @@ SC_MODULE(Control)
 	sc_in<bool> clock;
 	sc_in<bool> ula_flagN;
 	sc_in<bool> ula_flagZ;
-	sc_in<ISA> instruction_decode;
+	sc_in<sc_uint<8>> instruction_decode;
 
 	sc_out<bool> mem_read;
 	sc_out<bool> pc_incr;
@@ -82,12 +67,14 @@ SC_MODULE(Control)
 				pc_load = true;
 				break;
 			case JN:
-				if (_n_flag) {
+				if (_n_flag)
+				{
 					pc_load = true;
 				}
 				break;
 			case JZ:
-				if (_z_flag) {
+				if (_z_flag)
+				{
 					pc_load = true;
 				}
 				break;
@@ -100,7 +87,7 @@ SC_MODULE(Control)
 			case OR:
 			case LDA:
 			default:
-				_state = State::CS_HLT;  // should not reach
+				_state = State::CS_HLT; // should not reach
 				break;
 			}
 			break;
@@ -111,33 +98,7 @@ SC_MODULE(Control)
 			break;
 		case CS_ALU_EXEC:
 			pc_incr = false;
-			switch (_instruction)
-			{
-			case ADD:
-				ula_op = 1;
-				break;
-			case AND:
-				ula_op = 2;
-				break;
-			case OR:
-				ula_op = 3;
-				break;
-			case NOT:
-				ula_op = 4;
-				break;
-			case LDA:
-				ula_op = 5;
-				break;
-			case JMP:
-			case JN:
-			case JZ:
-			case NOP:
-			case HLT:
-			case STA:
-			default:
-				_state = State::CS_HLT;  // should not reach
-				break;
-			}
+			ula_op = alu_op(_instruction);
 			break;
 		case CS_HLT:
 			break;
@@ -176,7 +137,10 @@ SC_MODULE(Control)
 				case JN:
 				case JZ:
 				default:
-					_state = CS_LOAD_OP_DATA;
+					if (has_op(_instruction))
+					{
+						_state = CS_LOAD_OP_DATA;
+					}
 				}
 				break;
 			case CS_LOAD_OP_ADDR:
@@ -242,6 +206,28 @@ SC_MODULE(Control)
 	unsigned int instruction_count() { return _inst_count; }
 
 private:
+	static const unsigned int NOP = 0b0'000'0'000;
+	static const unsigned int NOT = 0b0'100'0'000;
+	static const unsigned int HLT = 0b0'111'0'000;
+	static const unsigned int STA = 0b1'000'0'000;
+	static const unsigned int ADD = 0b1'001'0'000;
+	static const unsigned int AND = 0b1'010'0'000;
+	static const unsigned int OR = 0b1'011'0'000;
+	static const unsigned int LDA = 0b1'101'0'000;
+	static const unsigned int JMP = 0b1'110'0'000;
+	static const unsigned int JN = 0b1'111'1'000;
+	static const unsigned int JZ = 0b1'111'0'000;
+
+	static unsigned int alu_op(const unsigned int inst)
+	{
+		return (inst & 0b0'111'0'000) >> 4;
+	}
+
+	static bool has_op(const unsigned int inst)
+	{
+		return inst & 0b1'000'0'000;
+	}
+
 	void end_instruction()
 	{
 		_inst_count++;
@@ -266,7 +252,7 @@ private:
 	// Internal Signals
 	sc_signal<State> _state;
 
-	ISA _instruction;
+	sc_uint<8> _instruction;
 	bool _n_flag;
 	bool _z_flag;
 
@@ -274,4 +260,4 @@ private:
 	unsigned int _inst_count;
 };
 
-#endif /* CONTROL_H_ */
+#endif /* CONTROL_HH_ */
