@@ -64,7 +64,7 @@ SC_MODULE(Neander)
 		_mux_addr.select(_mem_addr_sel);
 		_mux_addr.a(_pc_data_out);
 		_mux_addr.b(_mem_data_out_uint);
-		_mux_addr.output(_mem_addr_in); // TODO
+		_mux_addr.output(_mem_addr_in);
 
 		_mem.write(_mem_wr);
 		_mem.read(_mem_rd);
