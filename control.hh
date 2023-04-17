@@ -33,17 +33,18 @@ SC_MODULE(Control)
 			ac_load = false;
 			mem_addr_src = false;
 			mem_write = false;
+			pc_load = false;
 			break;
 		case CS_MEM_READ_INST:
 			mem_read = false;
-			pc_incr = true;
+			pc_incr = false;
 			_instruction = instruction_decode;
 			break;
 		case CS_DECODE_INST:
 			break;
 		case CS_LOAD_OP_ADDR:
 			mem_read = true;
-			pc_incr = false;
+			pc_incr = true;
 			break;
 		case CS_LOAD_OP_DATA:
 			mem_addr_src = true;
@@ -52,7 +53,7 @@ SC_MODULE(Control)
 			break;
 		case CS_MEM_READ_DATA:
 			mem_addr_src = false;
-			mem_read = true;
+			mem_read = false;
 			break;
 		case CS_MEM_WRITE:
 			mem_addr_src = true;
@@ -92,9 +93,9 @@ SC_MODULE(Control)
 			}
 			break;
 		case CS_ALU_AC_WRITE:
-			ac_load = true;
 			_n_flag = ula_flagN;
 			_z_flag = ula_flagZ;
+			ac_load = true;
 			break;
 		case CS_ALU_EXEC:
 			pc_incr = false;
@@ -118,6 +119,7 @@ SC_MODULE(Control)
 				_state = CS_DECODE_INST;
 				break;
 			case CS_DECODE_INST:
+				//std::cout << "INST: " << instruction_stringfy(_instruction) << " - " << _instruction << std::endl;
 				switch (_instruction)
 				{
 				case NOP:
@@ -140,7 +142,7 @@ SC_MODULE(Control)
 				default:
 					if (has_op(_instruction))
 					{
-						_state = CS_LOAD_OP_DATA;
+						_state = CS_LOAD_OP_ADDR;
 					}
 				}
 				break;
@@ -197,43 +199,91 @@ SC_MODULE(Control)
 
 	SC_CTOR(Control)
 	{
-		SC_METHOD(process);
-		sensitive << _state;
-
 		SC_METHOD(next_state);
 		sensitive_pos << clock;
+
+		SC_METHOD(process);
+		sensitive << _state
+				  << instruction_decode;
 	}
 
-	unsigned int cycles() { return _cycles; }
-	unsigned int instruction_count() { return _inst_count; }
-
-	static const char* instruction_stringfy(unsigned instruction)
+	unsigned int cycles()
 	{
-		switch(instruction) {
-			case NOP:
-				return("NOP");
-			case NOT:
-				return("NOT");
-			case HLT:
-				return("HLT");
-			case STA:
-				return("STA");
-			case ADD:
-				return("ADD");
-			case AND:
-				return("AND");
-			case OR:
-				return("OR "); 
-			case LDA:
-				return("LDA");
-			case JMP:
-				return("JMP");
-			case JN:
-				return("JN "); 
-			case JZ:
-				return("JZ "); 
-			default:
-				return("UNK");
+		return _cycles;
+	}
+	unsigned int instruction_count()
+	{
+		return _inst_count;
+	}
+
+	static const char *instruction_stringfy(unsigned instruction)
+	{
+		switch (instruction)
+		{
+		case NOP:
+			return ("NOP");
+		case NOT:
+			return ("NOT");
+		case HLT:
+			return ("HLT");
+		case STA:
+			return ("STA");
+		case ADD:
+			return ("ADD");
+		case AND:
+			return ("AND");
+		case OR:
+			return ("OR ");
+		case LDA:
+			return ("LDA");
+		case JMP:
+			return ("JMP");
+		case JN:
+			return ("JN ");
+		case JZ:
+			return ("JZ ");
+		default:
+			return ("UNK");
+		}
+	}
+
+	const char *get_state_str()
+	{
+		switch (_state.read())
+		{
+		case CS_FETCH_INST:
+			return ("FETCH_INST");
+			break;
+		case CS_MEM_READ_INST:
+			return ("MEM_READ_INST");
+			break;
+		case CS_DECODE_INST:
+			return ("DECODE_INST");
+			break;
+		case CS_LOAD_OP_ADDR:
+			return ("LOAD_OP_ADDR");
+			break;
+		case CS_LOAD_OP_DATA:
+			return ("LOAD_OP_DATA");
+			break;
+		case CS_MEM_READ_DATA:
+			return ("MEM_READ_DATA");
+			break;
+		case CS_MEM_WRITE:
+			return ("MEM_WRITE");
+			break;
+		case CS_JMP_EXEC:
+			return ("JMP_EXEC");
+			break;
+		case CS_ALU_AC_WRITE:
+			return ("ALU_AC_WRITE");
+			break;
+		case CS_ALU_EXEC:
+			return ("ALU_EXEC");
+			break;
+		case CS_HLT:
+			return ("HLT");
+			break;
 		}
 	}
 
@@ -248,8 +298,8 @@ SC_MODULE(Control)
 	static const unsigned int JMP = 0b1'110'0'000;
 	static const unsigned int JN = 0b1'111'1'000;
 	static const unsigned int JZ = 0b1'111'0'000;
-private:
 
+private:
 	static unsigned int alu_op(const unsigned int inst)
 	{
 		return (inst & 0b0'111'0'000) >> 4;

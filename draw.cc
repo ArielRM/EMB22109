@@ -19,7 +19,7 @@ void Neander::draw() {
 
 	std::snprintf(pc_data_out, 5, "0x%02X", static_cast<unsigned>(_pc_data_out.read()));
 	std::snprintf(mem_addr_in, 5, "0x%02X", static_cast<unsigned>(_mem_addr_in.read()));
-	std::snprintf(mem_data_out, 5, "%.4i", static_cast<int>(static_cast<sc_int<8>>(_mem_data_out.read())));
+	std::snprintf(mem_data_out, 5, "%.4d", static_cast<int>(static_cast<sc_int<8>>(_mem_data_out.read())));
 	std::snprintf(mux_in, 5, "0x%02X", static_cast<unsigned>(static_cast<sc_uint<8>>(_mem_data_out.read())));
 
 	unsigned int isa = static_cast<unsigned>(static_cast<sc_uint<8>>(_mem_data_out.read()));

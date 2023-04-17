@@ -35,7 +35,7 @@ SC_MODULE(Counter)
 	SC_CTOR(Counter) : _count(0)
 	{
 		SC_METHOD(process);
-		sensitive << clock.pos() << reset;
+		sensitive << clock.pos() << reset.pos();
 	}
 
 	// Unit testbench
