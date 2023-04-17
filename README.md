@@ -44,6 +44,7 @@ stateDiagram-v2
     s8 --> [*]
 
     note right of s0
+        pc_load = false
         mem_read = true
         pc_incr = true
         ac_load = false
